@@ -1,105 +1,107 @@
-function establecerIdiomaInicio(idioma) {
+const LANG = {};
+
+LANG.establecerIdiomaInicio = function(idioma) {
   document.getElementById('langSelector').hidden = true;
-  establecerIdioma(idioma);
-  armarSelectorIdioma(idioma);
-}
+  LANG.establecerIdioma(idioma);
+  LANG.armarSelectorIdioma(idioma);
+};
 
-function establecerIdioma(idioma) {
+LANG.establecerIdioma = function(idioma) {
   window.sessionStorage.setItem('selected_lang', idioma);
-  actualizarTextos(idioma);
-}
+  LANG.actualizarTextos(idioma);
+};
 
-function actualizarTextos(lang) {
-  if (lang in textos) {
-    for (let clase in textos[lang].contenidoClase) {
-      let doms = document.getElementsByClassName(clase);
-      for (dom of doms) {
-        dom.innerHTML = textos[lang].contenidoClase[clase];
-      }
-    }
-    for (let id in textos[lang].contenidoId) {
-      let dom = document.getElementById(id);
-      if (dom) dom.innerHTML = textos[lang].contenidoId[id];
-    }
-    for (let id in textos[lang].valorId) {
-      let dom = document.getElementById(id);
-      if (dom) dom.value = textos[lang].valorId[id];
-    }
+LANG.actualizarTextos = function(lang) {
+  if (lang in LANG.textos) {
+    LANG.actualizarGrupoTextos(lang, 'contenidoClase', (x) => document.getElementsByClassName(x), function(doms, texto) {
+      for (let dom of doms) { dom.innerHTML = texto; }
+    });
+    LANG.actualizarGrupoTextos(lang, 'contenidoId', (x) => document.getElementById(x),
+      function(dom, texto) { dom.innerHTML = texto; });
+    LANG.actualizarGrupoTextos(lang, 'valorId', (x) => document.getElementById(x),
+      function(dom, texto) { dom.value = texto; });
   }
-}
+};
 
-const textos = {
+LANG.actualizarGrupoTextos = function(lang, grupo, get, assign) {
+  for (let clave in LANG.textos[lang][grupo]) {
+    let elemento = get(clave);
+    if (elemento) assign(elemento, LANG.textos[lang][grupo][clave]);
+  }
+};
+
+LANG.textos = {
   'es':{
     id:"Español",
-    contenidoClase: {
-      'index-linkJuego': 'Jugar'
-    },
-    contenidoId: {
-      'juego-titulo-texto': 'Cantidad jugadas:'
-    },
-    valorId: {
-      'botonEmpezar': 'Empezar'
-    }
+    contenidoClase: {},
+    contenidoId: {},
+    valorId: {}
   },
   'en':{
     id:"English",
-    contenidoClase: {
-      'index-linkJuego': 'Play'
-    },
-    contenidoId: {
-      'juego-titulo-texto': 'Number of plays:'
-    },
-    valorId: {
-      'botonEmpezar': 'Start'
+    contenidoClase: {},
+    contenidoId: {},
+    valorId: {}
+  }
+};
+
+LANG.agregarTextos = function(textos) {
+  for (let idioma in textos) {
+    if (idioma in LANG.textos) {
+      for (let grupo in textos[idioma]) {
+        if (grupo in LANG.textos[idioma]) {
+          LANG.textos[idioma][grupo] = Object.assign(LANG.textos[idioma][grupo], textos[idioma][grupo]);
+        }
+      }
     }
   }
 };
 
-function armarSelectorIdioma(i) {
+LANG.armarSelectorIdioma = function(i) {
   let langChooser = document.getElementById('langChooser');
-  let idiomas = Object.keys(textos);
+  let idiomas = Object.keys(LANG.textos);
   let contenidoLangChooser = '';
   for (let j of idiomas) {
     contenidoLangChooser += `<option value="${j}"`;
     if (i==j) {
       contenidoLangChooser += ' selected';
     }
-    contenidoLangChooser += `>${textos[j].id}</option>`;
+    contenidoLangChooser += `>${LANG.textos[j].id}</option>`;
   }
   langChooser.innerHTML = contenidoLangChooser;
   langChooser.hidden = false;
-  if (typeof onLoad !== 'undefined') { onLoad(); }
-}
+  if (typeof LANG.onLoad !== 'undefined') { LANG.onLoad(); }
+};
 
-function selectorIdioma() {
+LANG.selectorIdioma = function() {
   let idiomaActual = window.sessionStorage.getItem('selected_lang');
   let langChooser = document.getElementById('langChooser');
   if (langChooser.value != idiomaActual) {
-    establecerIdioma(langChooser.value);
+    LANG.establecerIdioma(langChooser.value);
   }
-}
+};
 
-function run() {
+LANG.inicializar = function(textos, onLoad) {
+  if (typeof onLoad !== 'undefined') { LANG.onLoad = onLoad; }
+  LANG.agregarTextos(textos);
   let div = document.createElement('div');
   div.setAttribute('style', 'position: absolute; top: 10px; margin-right: 0px; right: 20px;');
   document.body.insertBefore(div, document.body.firstChild);
-  div.innerHTML = '<select id="langChooser" onchange="selectorIdioma();" hidden></select>';
+  div.innerHTML = '<select id="langChooser" onchange="LANG.selectorIdioma();" hidden></select>';
   let idioma = window.sessionStorage.getItem('selected_lang');
   if (idioma) {
-    actualizarTextos(idioma);
-    armarSelectorIdioma(idioma);
+    LANG.actualizarTextos(idioma);
+    LANG.armarSelectorIdioma(idioma);
   } else {
     let div = document.createElement('div');
     div.setAttribute('id', 'langSelector');
     document.body.insertBefore(div, null);
-    let idiomas = Object.keys(textos);
+    let idiomas = Object.keys(LANG.textos);
     let contenido = '';
     for (let i of idiomas) {
-      contenido += `<input class="btn" type="button" onclick="establecerIdiomaInicio('${i}');" value="${textos[i].id}"/>`;
+      contenido += `<input class="btn" type="button" onclick="LANG.establecerIdiomaInicio('${i}');" value="${LANG.textos[i].id}"/>`;
     }
     div.innerHTML = contenido;
     div.hidden = false;
   }
-}
-
-window.addEventListener('load', run);
+};
