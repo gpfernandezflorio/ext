@@ -12,6 +12,9 @@ LANG.establecerIdioma = function(idioma) {
 };
 
 LANG.actualizarTextos = function(lang) {
+  if (lang === undefined) {
+    lang = window.sessionStorage.getItem('selected_lang');
+  }
   if (lang in LANG.textos) {
     LANG.actualizarGrupoTextos(lang, 'contenidoClase', (x) => document.getElementsByClassName(x), function(doms, texto) {
       for (let dom of doms) { dom.innerHTML = texto; }

@@ -50,6 +50,20 @@ const textos = {
   }
 };
 
+## settings.js
+
+Paquete para armar un menú de configuración.
+
+### Funcionamiento
+
+Se debe invocar a la función _Settings.menu_ que toma el id de una div donde incrustar el menú y una lista de los elementos del menú.
+
+### Formato de los elementos del menú
+
+Cada elemento en la lista pasada como segundo argumento de _Settings.menu_ debe ser un objeto.
+
+COMPELTAR...
+
 ## server.py
 
 TODO
