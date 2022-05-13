@@ -48,11 +48,14 @@ Settings.menu = function(div_id, settings) {
         if (campo.opciones == "texto") {
           contenido += '<input type="text"' + contenidoCampo + '>';
         } else if (campo.opciones == "numero") {
-          if (campo.min) {
+          if ('min' in campo) {
             contenidoCampo += ` min="${campo.min}"`;
           }
-          if (campo.max) {
+          if ('max' in campo) {
             contenidoCampo += ` max="${campo.max}"`;
+          }
+          if ('step' in campo) {
+            contenidoCampo += ` step="${campo.step}"`;
           }
           contenido += '<input type="number"' + contenidoCampo + '>';
         } else if (campo.opciones == "bool") {
