@@ -29,10 +29,13 @@ Settings.elemento = function(setting) {
   return contenido;
 };
 
-Settings.menu = function(div_id, settings) {
+Settings.menu = function(div_id, settings, additional_options={}) {
   Settings.dependencias = {};
   let contenido = '<table>';
   for (let setting of settings) {
+    if (additional_options.defaultClass && !(setting.class)) {
+        setting.class = additional_options.defaultClass;
+    }
     contenido += '<tr>';
     contenido += '<td';
     contenido += Settings.elemento(setting);
